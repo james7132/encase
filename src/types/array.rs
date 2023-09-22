@@ -9,10 +9,12 @@ pub struct ArrayMetadata {
 }
 
 impl Metadata<ArrayMetadata> {
+    #[inline]
     pub const fn stride(self) -> SizeValue {
         self.extra.stride
     }
 
+    #[inline]
     pub const fn el_padding(self) -> u64 {
         self.extra.el_padding
     }
