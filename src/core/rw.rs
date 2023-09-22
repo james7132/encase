@@ -227,7 +227,7 @@ impl BufferMut for [u8] {
     #[inline]
     fn write<const N: usize>(&mut self, offset: usize, val: &[u8; N]) {
         use crate::utils::SliceExt;
-        *self.array_mut(offset) = *val;
+        unsafe { *self.array_mut_unchecked(offset) = *val; }
     }
 }
 

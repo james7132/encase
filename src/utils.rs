@@ -106,6 +106,8 @@ pub(crate) trait SliceExt<T> {
     ///
     /// Panics if the range `offset..offset + N` is out of bounds.
     fn array_mut<const N: usize>(&mut self, offset: usize) -> &mut [T; N];
+
+    unsafe fn array_mut_unchecked<const N: usize>(&mut self, offset: usize) -> &mut [T; N];
 }
 
 impl<T> SliceExt<T> for [T] {
@@ -131,6 +133,12 @@ impl<T> SliceExt<T> for [T] {
         // SAFETY
         // casting to &mut [T; N] is safe since src is a &mut [T] of length N
         unsafe { &mut *(src.as_mut_ptr() as *mut [T; N]) }
+    }
+
+    #[inline]
+    unsafe fn array_mut_unchecked<const N: usize>(&mut self, offset: usize) -> &mut [T; N] {
+        let src = self.as_mut_ptr().add(offset);
+        &mut *(src as *mut [T; N])
     }
 }
 
