@@ -1,6 +1,6 @@
 use crate::core::{
     BufferMut, BufferRef, CreateFrom, Metadata, ReadFrom, Reader, ShaderSize, ShaderType,
-    SizeValue, WriteInto, Writer,
+    SizeValue, WriteInto, Writer, RWResult
 };
 
 pub struct ArrayMetadata {
@@ -64,11 +64,12 @@ where
     Self: ShaderType<ExtraMetadata = ArrayMetadata>,
 {
     #[inline]
-    fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) {
+    fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) -> RWResult<()> {
         for item in self {
-            WriteInto::write_into(item, writer);
+            WriteInto::write_into(item, writer)?;
             writer.advance(Self::METADATA.el_padding() as usize);
         }
+        Ok(())
     }
 }
 

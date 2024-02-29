@@ -1,3 +1,5 @@
+use crate::core::RWResult;
+
 /// Used to implement `ShaderType` for the given wrapper type
 ///
 /// # Args
@@ -82,7 +84,7 @@ macro_rules! impl_wrapper_inner {
             T: $crate::private::WriteInto
         {
             #[inline]
-            fn write_into<B: $crate::private::BufferMut>(&self, writer: &mut $crate::private::Writer<B>) {
+            fn write_into<B: $crate::private::BufferMut>(&self, writer: &mut $crate::private::Writer<B>) -> RWResult<()> {
                 <T as $crate::private::WriteInto>::write_into(&self$($get_ref)*, writer)
             }
         }

@@ -227,8 +227,14 @@ pub trait RuntimeSizedArray {
     fn len(&self) -> usize;
 }
 
+pub enum ReadWriteError {
+    BufferTooSmall,
+}
+
+pub type RWResult<T> = Result<T, ReadWriteError>;
+
 pub trait WriteInto {
-    fn write_into<B>(&self, writer: &mut Writer<B>)
+    fn write_into<B>(&self, writer: &mut Writer<B>) -> RWResult<()>
     where
         B: BufferMut;
 }

@@ -2,7 +2,7 @@ use std::collections::{LinkedList, VecDeque};
 
 use crate::core::{
     BufferMut, BufferRef, CreateFrom, Metadata, ReadFrom, Reader, RuntimeSizedArray, ShaderSize,
-    WriteInto, Writer,
+    WriteInto, Writer, RWResult
 };
 use crate::ShaderType;
 
@@ -39,9 +39,9 @@ impl ShaderType for ArrayLength {
 impl ShaderSize for ArrayLength {}
 
 impl WriteInto for ArrayLength {
-    fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) {
+    fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) -> RWResult<()> {
         let length = writer.ctx.rts_array_length.unwrap();
-        WriteInto::write_into(&length, writer);
+        WriteInto::write_into(&length, writer)
     }
 }
 
@@ -179,13 +179,15 @@ macro_rules! impl_rts_array_inner {
             Self: $crate::private::ShaderType<ExtraMetadata = $crate::private::ArrayMetadata>,
             for<'a> &'a Self: ::core::iter::IntoIterator<Item = &'a T>,
         {
-            fn write_into<B: $crate::private::BufferMut>(&self, writer: &mut $crate::private::Writer<B>) {
+            fn write_into<B: $crate::private::BufferMut>(&self, writer: &mut $crate::private::Writer<B>) -> RWResult<()> {
                 use ::core::iter::IntoIterator;
 
                 for item in self.into_iter() {
-                    $crate::private::WriteInto::write_into(item, writer);
+                    $crate::private::WriteInto::write_into(item, writer)?;
                     writer.advance(<Self as $crate::private::ShaderType>::METADATA.el_padding() as ::core::primitive::usize);
                 }
+
+                Ok(())
             }
         }
 

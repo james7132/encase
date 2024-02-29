@@ -1,6 +1,6 @@
 use crate::core::{
     BufferMut, BufferRef, CreateFrom, Metadata, ReadFrom, Reader, ShaderSize, ShaderType,
-    WriteInto, Writer,
+    WriteInto, Writer, RWResult
 };
 use core::num::{NonZeroI32, NonZeroU32, Wrapping};
 use core::sync::atomic::{AtomicI32, AtomicU32};
@@ -22,8 +22,9 @@ macro_rules! impl_traits {
 
         impl WriteInto for $type {
             #[inline]
-            fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) {
+            fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) -> RWResult<()> {
                 writer.write(&<$type>::to_le_bytes(*self));
+                Ok(())
             }
         }
 
@@ -53,9 +54,9 @@ macro_rules! impl_traits_for_non_zero_option {
 
         impl WriteInto for Option<$type> {
             #[inline]
-            fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) {
+            fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) -> RWResult<()> {
                 let value = self.map(|num| num.get()).unwrap_or(0);
-                WriteInto::write_into(&value, writer);
+                WriteInto::write_into(&value, writer)
             }
         }
 
@@ -84,8 +85,8 @@ macro_rules! impl_traits_for_wrapping {
 
         impl WriteInto for $type {
             #[inline]
-            fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) {
-                WriteInto::write_into(&self.0, writer);
+            fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) -> RWResult<()> {
+                WriteInto::write_into(&self.0, writer)
             }
         }
 
@@ -114,9 +115,9 @@ macro_rules! impl_traits_for_atomic {
 
         impl WriteInto for $type {
             #[inline]
-            fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) {
+            fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) -> RWResult<()> {
                 let value = self.load(std::sync::atomic::Ordering::Relaxed);
-                WriteInto::write_into(&value, writer);
+                WriteInto::write_into(&value, writer)
             }
         }
 
