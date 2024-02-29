@@ -152,6 +152,8 @@ pub mod private {
     pub use super::core::Reader;
     pub use super::core::RuntimeSizedArray;
     pub use super::core::SizeValue;
+    pub use super::core::RWResult;
+    pub use super::core::ReadWriteError;
     pub use super::core::WriteInto;
     pub use super::core::Writer;
     pub use super::types::array::ArrayMetadata;
