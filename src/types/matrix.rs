@@ -160,14 +160,15 @@ macro_rules! impl_matrix_inner {
             $el_ty: $crate::private::MatrixScalar + $crate::private::WriteInto,
         {
             #[inline]
-            fn write_into<B: $crate::private::BufferMut>(&self, writer: &mut $crate::private::Writer<B>) {
+            fn write_into<B: $crate::private::BufferMut>(&self, writer: &mut $crate::private::Writer<B>) -> $crate::core::RWResult<()> {
                 let columns = $crate::private::AsRefMatrixParts::<$el_ty, $c, $r>::as_ref_parts(self);
                 for col in columns {
                     for el in col {
-                        $crate::private::WriteInto::write_into(el, writer);
+                        $crate::private::WriteInto::write_into(el, writer)?;
                     }
                     writer.advance(<Self as $crate::private::ShaderType>::METADATA.col_padding() as ::core::primitive::usize);
                 }
+                Ok(())
             }
         }
 

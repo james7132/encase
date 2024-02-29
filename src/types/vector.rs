@@ -139,11 +139,12 @@ macro_rules! impl_vector_inner {
             $el_ty: $crate::private::VectorScalar + $crate::private::WriteInto,
         {
             #[inline]
-            fn write_into<B: $crate::private::BufferMut>(&self, writer: &mut $crate::private::Writer<B>) {
+            fn write_into<B: $crate::private::BufferMut>(&self, writer: &mut $crate::private::Writer<B>) -> $crate::core::RWResult<()> {
                 let elements = $crate::private::AsRefVectorParts::<$el_ty, $n>::as_ref_parts(self);
                 for el in elements {
-                    $crate::private::WriteInto::write_into(el, writer);
+                    $crate::private::WriteInto::write_into(el, writer)?;
                 }
+                Ok(())
             }
         }
 
