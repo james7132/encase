@@ -1,3 +1,5 @@
+use crate::core::{RWResult, ReadWriteError};
+
 #[track_caller]
 pub const fn consume_zsts<const N: usize>(_: [(); N]) {}
 
@@ -105,7 +107,7 @@ pub(crate) trait SliceExt<T> {
     /// # Panics
     ///
     /// Panics if the range `offset..offset + N` is out of bounds.
-    fn array_mut<const N: usize>(&mut self, offset: usize) -> &mut [T; N];
+    fn array_mut<const N: usize>(&mut self, offset: usize) -> RWResult<&mut [T; N]>;
 }
 
 impl<T> SliceExt<T> for [T] {
@@ -125,12 +127,14 @@ impl<T> SliceExt<T> for [T] {
     // track #![feature(split_array)] (https://github.com/rust-lang/rust/issues/90091)
 
     #[inline]
-    fn array_mut<const N: usize>(&mut self, offset: usize) -> &mut [T; N] {
-        let src = &mut self[offset..offset + N];
+    fn array_mut<const N: usize>(&mut self, offset: usize) -> RWResult<&mut [T; N]> {
+        let src = &mut self
+            .get_mut(offset..offset + N)
+            .ok_or(ReadWriteError::BufferTooSmall)?;
 
         // SAFETY
         // casting to &mut [T; N] is safe since src is a &mut [T] of length N
-        unsafe { &mut *(src.as_mut_ptr() as *mut [T; N]) }
+        Ok(unsafe { &mut *(src.as_mut_ptr() as *mut [T; N]) })
     }
 }
 

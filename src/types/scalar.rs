@@ -1,6 +1,6 @@
 use crate::core::{
-    BufferMut, BufferRef, CreateFrom, Metadata, ReadFrom, Reader, ShaderSize, ShaderType,
-    WriteInto, Writer, RWResult
+    BufferMut, BufferRef, CreateFrom, Metadata, RWResult, ReadFrom, Reader, ShaderSize, ShaderType,
+    WriteInto, Writer,
 };
 use core::num::{NonZeroI32, NonZeroU32, Wrapping};
 use core::sync::atomic::{AtomicI32, AtomicU32};
@@ -23,8 +23,7 @@ macro_rules! impl_traits {
         impl WriteInto for $type {
             #[inline]
             fn write_into<B: BufferMut>(&self, writer: &mut Writer<B>) -> RWResult<()> {
-                writer.write(&<$type>::to_le_bytes(*self));
-                Ok(())
+                writer.write(&<$type>::to_le_bytes(*self))
             }
         }
 

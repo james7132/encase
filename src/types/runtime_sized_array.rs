@@ -1,8 +1,8 @@
 use std::collections::{LinkedList, VecDeque};
 
 use crate::core::{
-    BufferMut, BufferRef, CreateFrom, Metadata, ReadFrom, Reader, RuntimeSizedArray, ShaderSize,
-    WriteInto, Writer, RWResult
+    BufferMut, BufferRef, CreateFrom, Metadata, RWResult, ReadFrom, Reader, RuntimeSizedArray,
+    ShaderSize, WriteInto, Writer,
 };
 use crate::ShaderType;
 

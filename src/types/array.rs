@@ -1,6 +1,6 @@
 use crate::core::{
-    BufferMut, BufferRef, CreateFrom, Metadata, ReadFrom, Reader, ShaderSize, ShaderType,
-    SizeValue, WriteInto, Writer, RWResult
+    BufferMut, BufferRef, CreateFrom, Metadata, RWResult, ReadFrom, Reader, ShaderSize, ShaderType,
+    SizeValue, WriteInto, Writer,
 };
 
 pub struct ArrayMetadata {

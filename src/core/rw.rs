@@ -1,4 +1,5 @@
 use super::ShaderType;
+use crate::core::RWResult;
 use thiserror::Error;
 
 #[derive(Clone, Copy, Debug, Error)]
@@ -47,7 +48,7 @@ impl<B: BufferMut> Writer<B> {
     }
 
     #[inline]
-    pub fn write<const N: usize>(&mut self, val: &[u8; N]) {
+    pub fn write<const N: usize>(&mut self, val: &[u8; N]) -> RWResult<()> {
         self.cursor.write(val)
     }
 }
@@ -139,9 +140,10 @@ impl<B: BufferMut> Cursor<B> {
     }
 
     #[inline]
-    fn write<const N: usize>(&mut self, val: &[u8; N]) {
-        self.buffer.write(self.pos, val);
+    fn write<const N: usize>(&mut self, val: &[u8; N]) -> RWResult<()> {
+        self.buffer.write(self.pos, val)?;
         self.pos += N;
+        Ok(())
     }
 
     #[inline]
@@ -170,7 +172,7 @@ pub trait BufferRef {
 pub trait BufferMut {
     fn capacity(&self) -> usize;
 
-    fn write<const N: usize>(&mut self, offset: usize, val: &[u8; N]);
+    fn write<const N: usize>(&mut self, offset: usize, val: &[u8; N]) -> RWResult<()>;
 
     #[inline]
     fn try_enlarge(&mut self, wanted: usize) -> core::result::Result<(), EnlargeError> {
@@ -225,9 +227,10 @@ impl BufferMut for [u8] {
     }
 
     #[inline]
-    fn write<const N: usize>(&mut self, offset: usize, val: &[u8; N]) {
+    fn write<const N: usize>(&mut self, offset: usize, val: &[u8; N]) -> RWResult<()> {
         use crate::utils::SliceExt;
-        *self.array_mut(offset) = *val;
+        *self.array_mut(offset)? = *val;
+        Ok(())
     }
 }
 
@@ -238,7 +241,7 @@ impl<const LEN: usize> BufferMut for [u8; LEN] {
     }
 
     #[inline]
-    fn write<const N: usize>(&mut self, offset: usize, val: &[u8; N]) {
+    fn write<const N: usize>(&mut self, offset: usize, val: &[u8; N]) -> RWResult<()> {
         <[u8] as BufferMut>::write(self, offset, val)
     }
 }
@@ -250,7 +253,7 @@ impl BufferMut for Vec<u8> {
     }
 
     #[inline]
-    fn write<const N: usize>(&mut self, offset: usize, val: &[u8; N]) {
+    fn write<const N: usize>(&mut self, offset: usize, val: &[u8; N]) -> RWResult<()> {
         <[u8] as BufferMut>::write(self, offset, val)
     }
 
@@ -288,7 +291,7 @@ macro_rules! impl_buffer_mut_for_wrappers {
             }
 
             #[inline]
-            fn write<const N: usize>(&mut self, offset: usize, val: &[u8; N]) {
+            fn write<const N: usize>(&mut self, offset: usize, val: &[u8; N]) -> RWResult<()> {
                 T::write(self, offset, val)
             }
 

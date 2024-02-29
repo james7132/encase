@@ -43,7 +43,9 @@ impl<B: BufferMut> StorageBuffer<B> {
     {
         let mut writer = Writer::new(value, &mut self.inner, 0)?;
         // SAFETY: The available space to write was already checked when constructing the writer
-        unsafe { value.write_into(&mut writer).unwrap_unchecked(); }
+        unsafe {
+            value.write_into(&mut writer).unwrap_unchecked();
+        }
         Ok(())
     }
 }
@@ -204,7 +206,9 @@ impl<B: BufferMut> DynamicStorageBuffer<B> {
 
         let mut writer = Writer::new(value, &mut self.inner, offset)?;
         // SAFETY: The available space to write was already checked when constructing the writer
-        unsafe { value.write_into(&mut writer).unwrap_unchecked(); }
+        unsafe {
+            value.write_into(&mut writer).unwrap_unchecked();
+        }
 
         self.offset += self.alignment.round_up(value.size().get()) as usize;
 
