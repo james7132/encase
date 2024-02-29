@@ -467,7 +467,7 @@ pub fn derive_shader_type(input: DeriveInput, root: &Path) -> TokenStream {
         root,
         |ident| {
             quote! {
-                #root::WriteInto::write_into(&self.#ident, writer);
+                #root::WriteInto::write_into(&self.#ident, writer)?;
             }
         },
         |padding| {
@@ -614,9 +614,10 @@ pub fn derive_shader_type(input: DeriveInput, root: &Path) -> TokenStream {
             Self: #root::ShaderType<ExtraMetadata = #root::StructMetadata<#nr_of_fields>>,
             #( for<'__> #field_types_2: #root::WriteInto, )*
         {
-            fn write_into<B: #root::BufferMut>(&self, writer: &mut #root::Writer<B>) {
+            fn write_into<B: #root::BufferMut>(&self, writer: &mut #root::Writer<B>) -> #root::core::RWResult<()> {
                 #set_contained_rt_sized_array_length
                 #( #write_into_buffer_body )*
+                Ok(())
             }
         }
 
